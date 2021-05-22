@@ -1,42 +1,59 @@
 import random
+from ufo import x, encouragement
 
-def is_guess_correct(guess):
+with open("nouns.txt", "r") as nouns_list:
+    nouns = nouns_list.readlines()
+   
+
+def guess_is_correct(guess, word):
+    return guess in word
+
+def update_board(guess, word, board):
+    for i in range(len(word)):
+        if word[i] == guess:
+            board = board[0:i] + guess + board[i+1:]
+    return board
 
 def UFO():
     words = ["apple", "berry", "cherry", "blave"]
-    chosen_word = random.choice(words)
+    chosen_word = random.choice(nouns).replace('\n', '').upper()
     used_letters = []
     wrong_guesses = 0
 
     board = chosen_word
     for i in range(len(board)):
         board = board[0:i] + "_" + board[i+1:]
-    print(" ".join(board))
+    print('Codeword: ' + " ".join(board))
 
     while board != chosen_word:
         if wrong_guesses >= 6:
-            return "Oh no, you lost!"
+            print("Oh no, you lost!")
+            return
         
         guess = input("Please guess a letter in the codeword:  ")
-        guess = guess.lower()
+        guess = guess.upper()
 
-        if guess in used_letters:
-            print("Invalid Input: You already guessed that.")
-        elif guess not in 'abcdefghijklmnopqrstuvwxyz':
+        if len(guess) != 1:
+            print('Invalid Input: Please enter one guess at a time.')
+        elif guess not in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
             print('Invalid Input: Please only choose letters.')
+        elif guess in used_letters:
+            print("Invalid Input: You already guessed that.")
         else:
             used_letters.extend(guess)
-            print(f"Letters Used: {used_letters}")
-
-        if guess in chosen_word:
-            for i in range(len(chosen_word)):
-                if chosen_word[i] == guess:
-                    board = board[0:i] + guess + board[i+1:]
+        
+        if guess_is_correct(guess, chosen_word):
+            board = update_board(guess, chosen_word, board)
+            print('That is correct!')
         else:
             wrong_guesses +=1
+            print(random.choice(encouragement))
             
-        print(board)
+        print(x[wrong_guesses])   
+        print('Codeword: ' + " ".join(board))
+        print(f"Letters Used: {' '.join(used_letters)}")
         print(f"Wrong guesses: {wrong_guesses}")
+
     print('You win!')
 
 def replay():
@@ -52,6 +69,7 @@ def replay():
         print('Invalid Input.  Goodbye.')
 
 def game():
+    print(x[0])
     print('Invaders from outer space have arrived and are abducting humans using tractor beams.  Earn your medal of honor by cracking the codeword to stop the abduction!')
     print()
     print('How to play:')
@@ -61,6 +79,5 @@ def game():
 
     UFO()
     replay()
-
 
 game()
